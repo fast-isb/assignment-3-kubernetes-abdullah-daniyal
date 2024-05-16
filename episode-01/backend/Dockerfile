@@ -1,18 +1,24 @@
-FROM node:14
+# Use an official runtime as a parent image
+FROM node:20.13.1-alpine3.19
 
-# Create and change to the app directory.
-WORKDIR /usr/src/app
+# Set the working directory in the container
+WORKDIR /app
 
-# Copy application dependency manifests to the container image.
-# A wildcard is used to ensure both package.json AND package-lock.json are copied.
-# Copying this separately prevents re-running npm install on every code change.
+# Copy the current directory contents into the container at /usr/src/app
 COPY package*.json ./
 
-# Install production dependencies.
-RUN npm install --only=production
+# Install any needed packages specified in package.json
+RUN npm install
 
-# Copy local code to the container image.
+# Copy the rest of the application code
 COPY . .
 
-# Run the web service on container startup.
-CMD [ "node", "src/server.js" ]
+# Make port 80 available to the world outside this container
+EXPOSE 5000
+
+# Define environment variable, the port and MONGO_DB_SECRET
+ENV PORT=5000
+# ENV MONGO_DB_SECRET=mongodb://localhost:27017/A3
+ENV MONGO_DB_SECRET=mongodb+srv://abdullahdaniyal:superflies1234@cluster0.s5b7diq.mongodb.net/scd3
+# Run app.py when the container launches
+CMD ["node", "./src/server.js"]
