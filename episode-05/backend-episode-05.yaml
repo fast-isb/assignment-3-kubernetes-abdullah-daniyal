@@ -1,34 +1,35 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend-episode-05
+  name: episode-5-backend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: backend-episode-05
+      app: episode-5-backend
   template:
     metadata:
       labels:
-        app: backend-episode-05
+        app: episode-5-backend
     spec:
       containers:
-      - name: backend
-        image: abdullahdaniyal1234/mern-episode-05-backend:latest
-        ports:
-        - containerPort: 5000
-      volumes:
-        - name: database-volume
-          persistentVolumeClaim:
-            claimName: db-claim-episode-05
+        - name: backend
+          image: abdullahdaniyal1234/mern-episode-05-backend:latest
+          ports:
+            - containerPort: 5000
+          env:
+            - name: PORT
+              value: "5000"
+            - name: MONGO_DB_SECRET
+              value: "mongodb+srv://abdullahdaniyal:superflies1234@cluster0.s5b7diq.mongodb.net/scd3"
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: backend-episode-05
+  name: episode-5-backend
 spec:
   selector:
-    app: backend-episode-05
+    app: episode-5-backend
   ports:
     - protocol: TCP
       port: 5000

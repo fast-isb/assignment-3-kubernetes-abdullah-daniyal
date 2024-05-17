@@ -1,22 +1,34 @@
-FROM node:14-slim
+# Use an official runtime as a parent image
+FROM node:16.20.2-alpine3.18 as build
 
-# Create and change to the app directory.
-WORKDIR /usr/src/app
+# Set the working directory in the container
+WORKDIR /app
 
-# Copy application dependency manifests to the container image.
-# A wildcard is used to ensure both package.json AND package-lock.json are copied.
-# Copying this separately prevents re-running npm install on every code change.
+# Copy the current directory contents into the container at /usr/src/app
 COPY package*.json ./
 
-# Install production dependencies.
-RUN npm install --only=production
+# Install any needed packages specified in package.json
+RUN npm install
 
-# Copy local code to the container image.
+# Copy the rest of the application code
 COPY . .
 
-# Build the React application.
+# Run app.py when the container launches
 RUN npm run build
 
-# Install serve to run the application.
-RUN npm install -g serve
-CMD ["serve", "-s", "build"]
+
+#-----------------------------------------------------#
+# Run the build stage
+#-----------------------------------------------------#
+
+# Nginx stage
+FROM nginx:1.21.5-alpine
+
+# Copy the build output from the previous build stage
+COPY --from=build /app/build /usr/share/nginx/html
+
+# Expose port 80 to the outside world
+EXPOSE 3000
+
+# Command to run Nginx in the foreground
+CMD ["nginx", "-g", "daemon off;"]
